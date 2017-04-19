@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.rouplex</groupId>
+        <artifactId>rouplex-niossl-parent</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>rouplex-niossl</artifactId>
+    <version>1.8.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Java SSL Socket Channels for Jdk1.8</name>
+    <description>A library extending the Jdk1.8 java.nio.channels package with SSL implementations for
+        SocketChannel, ServerSocketChannel, Selector and SelectorProvider.
+    </description>
+
+    <properties>
+        <jdk.version>1.8</jdk.version>
+        <java.executable>${JAVA_1_8_HOME}/bin/java</java.executable>
+        <javac.executable>${JAVA_1_8_HOME}/bin/javac</javac.executable>
+        <aspectj.bootclasspath>${JAVA_1_8_HOME}/jre/lib/rt.jar:${JAVA_1_8_HOME}/jre/lib/jsse.jar</aspectj.bootclasspath>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <fork>true</fork>
+                    <executable>${javac.executable}</executable>
+                    <compilerVersion>${jdk.version}</compilerVersion>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
