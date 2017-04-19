@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>rouplex-niossl</artifactId>
-    <version>1.8.0</version>
+    <version>1.8.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Java SSL Socket Channels for Jdk1.8</name>
