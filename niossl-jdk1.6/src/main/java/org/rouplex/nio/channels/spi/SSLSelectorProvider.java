@@ -4,7 +4,9 @@ import org.rouplex.nio.channels.SSLSelector;
 import org.rouplex.nio.channels.SSLServerSocketChannel;
 import org.rouplex.nio.channels.SSLSocketChannel;
 
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.Pipe;
@@ -15,8 +17,6 @@ import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -30,8 +30,7 @@ public class SSLSelectorProvider extends SelectorProvider {
     private static SSLSelectorProvider sslSelectorProvider = null;
 
     /**
-     * Return the provider if already loaded, or try loading it by first trying ClassLoader.getSystemClassLoader() then
-     * ServiceLoader
+     * Load the provider if not already loaded, then return its reference.
      *
      * @return the loaded provider, never null
      */
@@ -52,9 +51,9 @@ public class SSLSelectorProvider extends SelectorProvider {
     }
 
     /**
-     * Try loading the provider via the ClassLoader.getSystemClassLoader()
+     * Try loading the provider by first trying a ClassLoader then ServiceLoader.
      *
-     * @return true if the provider was loaded, false otherwise
+     * @return a reference to the loaded provider if it was loaded, false otherwise
      */
     private static SSLSelectorProvider loadProvider(ClassLoader classLoader) {
         String fqcn = System.getProperty("java.nio.channels.spi.SSLSelectorProvider");
@@ -130,11 +129,11 @@ public class SSLSelectorProvider extends SelectorProvider {
 
     /**
      * Create an {@link SSLSocketChannel} instance by using an optional {@link SSLContext}, {@link ExecutorService}, or
-     * {@link SocketChannel}. Protecting it to avoid misuse, but a subclass could publish this method.
+     * {@link SocketChannel}.
      *
      * @param sslContext
-     *         An instance of {@link SSLContext} via which the caller defines the {@link javax.net.ssl.KeyManager} and
-     *         {@link javax.net.ssl.TrustManager} providing the private keys and certificates for the encryption and
+     *         An instance of {@link SSLContext} via which the caller defines the {@link KeyManager} and {@link
+     *         TrustManager} providing the private keys and certificates for the encryption and
      *         authentication/authorization of the remote party.
      *         If this parameter is null, then the JRE's default sslContext instance, configured with JRE's defaults,
      *         will be used for the {@link SSLSocketChannel} instance being created.
@@ -144,18 +143,18 @@ public class SSLSelectorProvider extends SelectorProvider {
      *         Used to execute long blocking operations of sslEngine as well as occasional flush outs. If left null,
      *         which is recommended, the default tasksExecutorService obtainable internally from
      *         {@link SSLSelectorProvider} will be used.
-     *         <p/>
      *         This executor service should allow for parallel execution among its tasks, since sslEngine can take
      *         advantage of it when performing long ops (a singleThreadExecutor, for example, would be a bad choice).
      *         Since the tasksExecutorService is not owned, it will not be shutdown when the channel is closed.
      * @param innerChannel
      *         The inner channels to be used by the secure channels being created, if it exists. The innerServerChannel
-     *         would exist in cases where the TCP connection has already been verified (and possibly used) with the
+     *         would exist in cases where the TCP connection has already been created (and possibly used) with the
      *         remote party.
      *         If null, a new channel will be created. If not null and not connected, the innerServerChannel will first
      *         be connected and then used by the secure one for the remainder of the session.
      * @return the newly created instance of {@link SSLSocketChannel}
      * @throws IOException
+     *         If anything goes wrong during the creation
      */
     public SSLSocketChannel openSocketChannel(SSLContext sslContext, boolean clientMode,
             ExecutorService executorService, SocketChannel innerChannel) throws IOException {
@@ -163,4 +162,11 @@ public class SSLSelectorProvider extends SelectorProvider {
         throw new IOException("This provider does not implement openSocketChannel. " +
                 "Include rouplex-niossl-spi provider for a concrete implementation");
     }
+
+//////////////////////// JDK 7+ ///////////
+//
+//    @Override
+//    public DatagramChannel openDatagramChannel(ProtocolFamily family) throws IOException {
+//        throw new IOException("Not implemented/available");
+//    }
 }

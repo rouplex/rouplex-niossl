@@ -12,10 +12,8 @@ import java.nio.channels.spi.AbstractSelector;
  * A subclass of a {@link Selector} that can be used to register and select on {@link SSLSocketChannel}s or
  * {@link SSLServerSocketChannel}s the same way as a Selector is used to register and select on {@link SocketChannel}s
  * or {@link ServerSocketChannel}s
- * <p/>
  * As with the rest of the package, we have stayed faithful to the requirements of the API, laid out at
  * http://docs.oracle.com/javase/7/docs/api/java/nio/channels/Selector.html.
- * <p/>
  *
  * @author Andi Mullaraj (andimullaraj at gmail.com)
  */

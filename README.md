@@ -1,18 +1,18 @@
 # README #
-Rouplex-Niossl is a java library providing SSL counterparts for java.nio.channels classes such as SocketChannel,
+Rouplex-Niossl is a java library providing SSL counterparts for classic java.nio.channels classes such as SocketChannel,
 ServerSocketChannel, Selector and SelectorProvider. This library is implemented in pure java, it is available for
 Jdk1.6 and later, and has no external dependencies. The SSL classes are completely compatible with the base classes
-(they simply extend and override their base functionality) and adhere fully to the clear channels documentation at
-https://docs.oracle.com/javase/8/docs/api/java/nio/channels/package-summary.html. That way one can use them with the
-full confidence, since they don't have to rethink any of their communication stack, just update their import statement
-and recompile.
+(they simply extend and override their base functionality) and adhere fully to the channels documentation available at
+https://docs.oracle.com/javase/8/docs/api/java/nio/channels/package-summary.html. This way, the existing products can
+be easily updated to provide secure communication and new products can achieve security of data in transit by using the
+already proven patterns for communication.
 
 ## Description ##
-Most of the successful services and online applications use java.nio.channels as the fastest alternative for
-communications, especially on the server side. Using this library would cut down complexity and development time for
-them, which we know it takes their teams from weeks to months at a time. As an example, an existing application which
-is using ServerSocketChannel with a Selector for their communications, would need to simply replace two import
-statements
+Most of the modern services and online applications use java.nio.channels as the better and faster alternative for
+communication, especially on the server side. Using this library would cut down considerably in complexity and
+development time since we have done the due diligence to provide a library that is completely compatible with the
+existing one for the plain channels. As an example, an existing application which is using ServerSocketChannel with a
+Selector for their communications, would need to simply replace two import statements
 
         import java.nio.channels.Selector;
         import java.nio.channels.ServerSocketChannel;
@@ -38,8 +38,8 @@ installed. Make sure the installation is successful by typing `java -version`; t
 version (1.6, 1.7, 1.8 or 1.9).
 
 1. The path to JDK home will be needed. Please edit (or create if missing) the ~/.m2/settings.xml file and setup the
-JAVA_1_6_HOME (or respective) property. Here is an example (edit the element JAVA_1_6_HOME (or respective) to contain
-your own JDK1.6 (or respective) installation path):
+JAVA_1_6_HOME (and/or JAVA_1_7_HOME etc) property. Here is an example (edit the element JAVA_1_6_HOME (or respective)
+to contain your own JDK1.6 (or respective) installation path):
 
         <settings>
             <profiles>
@@ -57,7 +57,7 @@ your own JDK1.6 (or respective) installation path):
             </activeProfiles>
         </settings>
 
-1. On a shell window, and from the folder containing this README.txt file, type `mvn clean install` and if
+1. On a shell window, and from the folder containing this README file, type `mvn clean install` and if
 successful, the built artifacts will be in the target folders inside each module. If you are
 interested in building for only one of the JDKs, then cd to the appropriate folder and perform a
 'mvn clean install' from there.

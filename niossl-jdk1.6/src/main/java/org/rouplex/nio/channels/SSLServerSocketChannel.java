@@ -10,11 +10,9 @@ import java.nio.channels.ServerSocketChannel;
 /**
  * A subclass of a {@link SSLServerSocketChannel} that provides same functionality as a {@link ServerSocketChannel} but
  * over a secured line with the remote endpoints.
- * <p/>
  * The various SSL configuration aspects, such as enabling particular secure protocols and ciphers, key and certificate
  * management, are handled via the {@link SSLContext} class, similar to the way it is done when {@link SSLSocket} class
  * is used.
- * <p/>
  *
  * @author Andi Mullaraj (andimullaraj at gmail.com)
  */
