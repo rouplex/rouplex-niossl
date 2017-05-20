@@ -24,7 +24,7 @@ public abstract class SSLServerSocketChannel extends ServerSocketChannel {
 
     /**
      * Create an {@link SSLServerSocketChannel} using the default security settings obtainable via
-     * {@link SSLContext#getDefault()}
+     * {@link SSLContext#getDefault()}.
      *
      * @return The newly created {@link SSLServerSocketChannel}
      * @throws IOException
@@ -35,7 +35,7 @@ public abstract class SSLServerSocketChannel extends ServerSocketChannel {
     }
 
     /**
-     * Create an {@link SSLServerSocketChannel} using security settings defined in {@link SSLContext}
+     * Create an {@link SSLServerSocketChannel} using security settings defined in {@link SSLContext}.
      *
      * @param sslContext
      *         The sslContext to be used or null to if JVM's default security settings are preferred
@@ -44,6 +44,6 @@ public abstract class SSLServerSocketChannel extends ServerSocketChannel {
      *         If anything goes wrong during the creation
      */
     public static SSLServerSocketChannel open(SSLContext sslContext) throws IOException {
-        return SSLSelectorProvider.provider().openServerSocketChannel(sslContext);
+        return SSLSelectorProvider.provider().openServerSocketChannel(sslContext, null, null);
     }
 }

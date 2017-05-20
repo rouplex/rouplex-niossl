@@ -108,13 +108,34 @@ public class SSLSelectorProvider extends SelectorProvider {
 
     @Override
     public SSLServerSocketChannel openServerSocketChannel() throws IOException {
-        return openServerSocketChannel(null);
+        return openServerSocketChannel(null, null, null);
     }
 
-    public SSLServerSocketChannel openServerSocketChannel(SSLContext sslContext) throws IOException {
-        return openServerSocketChannel(sslContext, null, null);
-    }
-
+    /**
+     * Create an {@link SSLServerSocketChannel} instance by using an optional {@link SSLContext} and
+     * {@link ExecutorService}.
+     *
+     * @param sslContext
+     *         An instance of {@link SSLContext} via which the caller defines the {@link KeyManager} and {@link
+     *         TrustManager} providing the private keys and certificates for the encryption and
+     *         authentication/authorization of the remote party.
+     *         If this parameter is null, then the JRE's default sslContext instance, configured with JRE's defaults,
+     *         will be used for the {@link SSLSocketChannel} instance being created.
+     * @param acceptExecutorService
+     *         Used to manage the process of accepting a connection and performing the SSL handshake. If left null,
+     *         which is recommended, the default tasksExecutorService obtainable internally from
+     *         {@link SSLSelectorProvider} will be used.
+     * @param tasksExecutorService
+     *         Used to execute long blocking operations of sslEngine as well as occasional flush outs. If left null,
+     *         which is recommended, the default tasksExecutorService obtainable internally from
+     *         {@link SSLSelectorProvider} will be used.
+     *         This executor service should allow for parallel execution among its tasks, since sslEngine can take
+     *         advantage of it when performing long ops (a singleThreadExecutor, for example, would be a bad choice).
+     *         Since the tasksExecutorService is not owned, it will not be shutdown when the channel is closed.
+     * @return the newly created instance of {@link SSLServerSocketChannel}
+     * @throws IOException
+     *         If anything goes wrong during the creation
+     */
     public SSLServerSocketChannel openServerSocketChannel(SSLContext sslContext,
             ExecutorService acceptExecutorService, ExecutorService tasksExecutorService) throws IOException {
 

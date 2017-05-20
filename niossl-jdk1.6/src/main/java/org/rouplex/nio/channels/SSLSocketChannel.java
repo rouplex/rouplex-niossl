@@ -2,10 +2,7 @@ package org.rouplex.nio.channels;
 
 import org.rouplex.nio.channels.spi.SSLSelectorProvider;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManager;
+import javax.net.ssl.*;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.SocketChannel;
@@ -26,7 +23,7 @@ public abstract class SSLSocketChannel extends SocketChannel {
     }
 
     /**
-     * Create an {@link SSLSocketChannel} using JVM's default security settings
+     * Create an {@link SSLSocketChannel} using JVM's default security settings.
      *
      * @return The newly created {@link SSLSocketChannel}
      * @throws IOException
@@ -38,7 +35,7 @@ public abstract class SSLSocketChannel extends SocketChannel {
 
     /**
      * Create an {@link SSLSocketChannel} using JVM's default security settings and connect it to the
-     * remote address before returning
+     * remote address before returning.
      *
      * @param socketAddress
      *         The socketAddress to connect right after the channels creation
@@ -51,7 +48,7 @@ public abstract class SSLSocketChannel extends SocketChannel {
     }
 
     /**
-     * Create an {@link SSLSocketChannel} using security settings defined in {@link SSLContext}
+     * Create an {@link SSLSocketChannel} using security settings defined in {@link SSLContext}.
      *
      * @param sslContext
      *         The sslContext to be used or null to if JVM's default security settings are preferred
@@ -65,7 +62,7 @@ public abstract class SSLSocketChannel extends SocketChannel {
 
     /**
      * Create an {@link SSLSocketChannel} using security settings defined in {@link SSLContext} and connect it before
-     * returning
+     * returning.
      *
      * @param socketAddress
      *         The socketAddress to connect right after the channels creation
@@ -77,7 +74,7 @@ public abstract class SSLSocketChannel extends SocketChannel {
      *         will be used for the {@link SSLSocketChannel} instance being created.
      * @return The newly created {@link SSLSocketChannel}
      * @throws IOException
-     *         if anything goes wrong during the creation
+     *         If anything goes wrong during the creation
      */
     public static SSLSocketChannel open(SocketAddress socketAddress, SSLContext sslContext) throws IOException {
         return open(socketAddress, sslContext, true, null, null);
@@ -85,7 +82,7 @@ public abstract class SSLSocketChannel extends SocketChannel {
 
     /**
      * Create an {@link SSLSocketChannel} using security settings defined in {@link SSLContext}, an existing (and
-     * possibly connected) {@link SocketChannel} and connect it before returning
+     * possibly connected) {@link SocketChannel} and connect it before returning.
      *
      * @param socketAddress
      *         The socketAddress to connect right after the channels creation
@@ -97,6 +94,9 @@ public abstract class SSLSocketChannel extends SocketChannel {
      *         will be used for the {@link SSLSocketChannel} instance being created.
      * @param clientMode
      *         True if the channel will be used on the client side, false if on the server
+     * @param tasksExecutorService
+     *         The executor service to be used for the long standing {@link SSLEngine} tasks. If null, a default
+     *         executor service, shared with other SSLSocketChannel instances, will be used.
      * @param innerChannel
      *         The inner channels to be used by the secure channels being created, if it exists. The innerChannel would
      *         exist in cases where the TCP connection has already been established (and possibly used) with the remote
@@ -105,7 +105,7 @@ public abstract class SSLSocketChannel extends SocketChannel {
      *         connected and then used by the secure one for the remainder of the session.
      * @return The newly created {@link SSLSocketChannel}
      * @throws IOException
-     *         if anything goes wrong during the creation
+     *         If anything goes wrong during the creation
      */
     public static SSLSocketChannel open(SocketAddress socketAddress, SSLContext sslContext,
             boolean clientMode, ExecutorService tasksExecutorService, SocketChannel innerChannel) throws IOException {
