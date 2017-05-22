@@ -10,6 +10,7 @@ import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.Pipe;
+import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 import java.security.AccessController;
@@ -20,7 +21,7 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ExecutorService;
 
 /**
- * The base SSLSelectorProvider, containing boilerplate code for loading an eventual implementation of the same.
+ * The base SSLSelectorProvider, containing code for loading an eventual implementation of the same.
  * If no implementations are found, then an instance of this class is returned, calls to which will fail with "not
  * implemented" {@link IOException}s.
  *
@@ -30,7 +31,18 @@ public class SSLSelectorProvider extends SelectorProvider {
     private static SSLSelectorProvider sslSelectorProvider = null;
 
     /**
-     * Load the provider if not already loaded, then return its reference.
+     * If the provider has been loaded prior to this call, then its reference will be returned.
+     *
+     * Otherwise, the system property "org.rouplex.nio.channels.spi.SSLSelectorProvider" will be checked for a fully
+     * qualified class name representing an implementation of {@link SSLSelectorProvider}. If the class pointed to, is
+     * loaded successfully then an instance of it will be created, cached for future use, and returned.
+     *
+     * If for any reason, an implementation is still not found, then the {@link ServiceLoader} class will be used to
+     * look up for a service instance implementing a {@link SSLSelectorProvider}. If one is found, it will be cached
+     * for future use, and returned.
+     *
+     * Lastly, if an implementation is still not found, then an instance of this same class will be cached for future
+     * use and returned. Calls to this implementation will fail with "not implemented" {@link IOException}s though.
      *
      * @return the loaded provider, never null
      */
@@ -53,10 +65,10 @@ public class SSLSelectorProvider extends SelectorProvider {
     /**
      * Try loading the provider by first trying a ClassLoader then ServiceLoader.
      *
-     * @return a reference to the loaded provider if it was loaded, false otherwise
+     * @return A reference to the loaded provider if it was loaded, false otherwise
      */
     private static SSLSelectorProvider loadProvider(ClassLoader classLoader) {
-        String fqcn = System.getProperty("java.nio.channels.spi.SSLSelectorProvider");
+        String fqcn = System.getProperty("org.rouplex.nio.channels.spi.SSLSelectorProvider");
         if (fqcn != null) {
             try {
                 return (SSLSelectorProvider) Class.forName(fqcn, true, classLoader).newInstance();
@@ -90,51 +102,83 @@ public class SSLSelectorProvider extends SelectorProvider {
         return null;
     }
 
+    /**
+     * This method is not implemented/available and it is not expected to be implemented by any provider.
+     *
+     * @return The created DatagramChannel instance
+     * @throws IOException
+     *         It will always throw "Not implemented/available"
+     */
     @Override
     public DatagramChannel openDatagramChannel() throws IOException {
         throw new IOException("Not implemented/available");
     }
 
+    /**
+     * This method is not implemented/available and it is not expected to be implemented by any provider.
+     *
+     * @return The created Pipe instance
+     * @throws IOException
+     *          It will always throw "Not implemented/available"
+     */
     @Override
     public Pipe openPipe() throws IOException {
         throw new IOException("Not implemented/available");
     }
 
+    /**
+     * Create an {@link SSLSelector} which can be used to select on {@link SSLSocketChannel},
+     * {@link SSLServerSocketChannel}, {@link SocketChannel}, {@link ServerSocketChannel}
+     *
+     * @return The created SSLSelector
+     * @throws IOException
+     *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
+     *         SSLSelector.
+     */
     @Override
     public SSLSelector openSelector() throws IOException {
         throw new IOException("This provider does not implement openSelector. " +
                 "Include rouplex-niossl-spi provider for a concrete implementation");
     }
 
+    /**
+     * Create an {@link SSLServerSocketChannel} instance using {@link SSLContext#getDefault()} and the default
+     * {@link ExecutorService} of the {@link SSLSelectorProvider}
+     *
+     * @return The newly created instance of {@link SSLServerSocketChannel}
+     * @throws IOException
+     *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
+     *         SSLServerSocketChannel.
+     */
     @Override
     public SSLServerSocketChannel openServerSocketChannel() throws IOException {
         return openServerSocketChannel(null, null, null);
     }
 
     /**
-     * Create an {@link SSLServerSocketChannel} instance by using an optional {@link SSLContext} and
-     * {@link ExecutorService}.
+     * Create an {@link SSLServerSocketChannel} instance by using an optional {@link SSLContext} for custom security
+     * needs, an optional {@link ExecutorService} for managing new connections, and an optional {@link ExecutorService}
+     * to be used by the {@link SSLSocketChannel}s accepted/created.
      *
      * @param sslContext
      *         An instance of {@link SSLContext} via which the caller defines the {@link KeyManager} and {@link
      *         TrustManager} providing the private keys and certificates for the encryption and
      *         authentication/authorization of the remote party.
-     *         If this parameter is null, then the JRE's default sslContext instance, configured with JRE's defaults,
-     *         will be used for the {@link SSLSocketChannel} instance being created.
+     *         If null, then the default {@link SSLContext}, containing JRE's defaults, and obtainable internally via
+     *         {@link SSLContext#getDefault()} will be used.
      * @param acceptExecutorService
      *         Used to manage the process of accepting a connection and performing the SSL handshake. If left null,
-     *         which is recommended, the default tasksExecutorService obtainable internally from
-     *         {@link SSLSelectorProvider} will be used.
+     *         which is recommended, the default executorService internal to {@link SSLSelectorProvider} will be used.
      * @param tasksExecutorService
      *         Used to execute long blocking operations of sslEngine as well as occasional flush outs. If left null,
-     *         which is recommended, the default tasksExecutorService obtainable internally from
-     *         {@link SSLSelectorProvider} will be used.
+     *         which is recommended, the default executorService internal to {@link SSLSelectorProvider} will be used.
      *         This executor service should allow for parallel execution among its tasks, since sslEngine can take
      *         advantage of it when performing long ops (a singleThreadExecutor, for example, would be a bad choice).
      *         Since the tasksExecutorService is not owned, it will not be shutdown when the channel is closed.
-     * @return the newly created instance of {@link SSLServerSocketChannel}
+     * @return The newly created instance of {@link SSLServerSocketChannel}
      * @throws IOException
-     *         If anything goes wrong during the creation
+     *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
+     *         SSLServerSocketChannel.
      */
     public SSLServerSocketChannel openServerSocketChannel(SSLContext sslContext,
             ExecutorService acceptExecutorService, ExecutorService tasksExecutorService) throws IOException {
@@ -143,27 +187,36 @@ public class SSLSelectorProvider extends SelectorProvider {
                 "Include rouplex-niossl-spi provider for a concrete implementation");
     }
 
+    /**
+     * Create an {@link SSLSocketChannel} instance using {@link SSLContext#getDefault()} and the default
+     *          {@link ExecutorService} of the {@link SSLSelectorProvider}
+     *
+     * @return The newly created instance of {@link SSLSocketChannel}
+     * @throws IOException
+     *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
+     *         SSLSocketChannel.
+     */
     @Override
     public SSLSocketChannel openSocketChannel() throws IOException {
         return openSocketChannel(null, false, null, null);
     }
 
     /**
-     * Create an {@link SSLSocketChannel} instance by using an optional {@link SSLContext}, {@link ExecutorService}, or
-     * {@link SocketChannel}.
+     * Create an {@link SSLSocketChannel} instance by using an optional {@link SSLContext} for custom security
+     * needs, an optional {@link ExecutorService} for managing ssl handshakes, and an optional {@link SocketChannel}
+     * to be used as underlying communication medium for the secure communication.
      *
      * @param sslContext
      *         An instance of {@link SSLContext} via which the caller defines the {@link KeyManager} and {@link
      *         TrustManager} providing the private keys and certificates for the encryption and
      *         authentication/authorization of the remote party.
-     *         If this parameter is null, then the JRE's default sslContext instance, configured with JRE's defaults,
-     *         will be used for the {@link SSLSocketChannel} instance being created.
+     *         If null, then the default {@link SSLContext}, containing JRE's defaults, and obtainable internally via
+     *         {@link SSLContext#getDefault()} will be used.
      * @param clientMode
      *         True if the channel will be used on the client side, false if on the server
      * @param executorService
      *         Used to execute long blocking operations of sslEngine as well as occasional flush outs. If left null,
-     *         which is recommended, the default tasksExecutorService obtainable internally from
-     *         {@link SSLSelectorProvider} will be used.
+     *         which is recommended, the default executorService internal to {@link SSLSelectorProvider} will be used.
      *         This executor service should allow for parallel execution among its tasks, since sslEngine can take
      *         advantage of it when performing long ops (a singleThreadExecutor, for example, would be a bad choice).
      *         Since the tasksExecutorService is not owned, it will not be shutdown when the channel is closed.
@@ -173,9 +226,10 @@ public class SSLSelectorProvider extends SelectorProvider {
      *         remote party.
      *         If null, a new channel will be created. If not null and not connected, the innerServerChannel will first
      *         be connected and then used by the secure one for the remainder of the session.
-     * @return the newly created instance of {@link SSLSocketChannel}
+     * @return The newly created instance of {@link SSLSocketChannel}
      * @throws IOException
-     *         If anything goes wrong during the creation
+     *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
+     *         SSLSocketChannel.
      */
     public SSLSocketChannel openSocketChannel(SSLContext sslContext, boolean clientMode,
             ExecutorService executorService, SocketChannel innerChannel) throws IOException {
@@ -183,11 +237,4 @@ public class SSLSelectorProvider extends SelectorProvider {
         throw new IOException("This provider does not implement openSocketChannel. " +
                 "Include rouplex-niossl-spi provider for a concrete implementation");
     }
-
-//////////////////////// JDK 7+ ///////////
-//
-//    @Override
-//    public DatagramChannel openDatagramChannel(ProtocolFamily family) throws IOException {
-//        throw new IOException("Not implemented/available");
-//    }
 }

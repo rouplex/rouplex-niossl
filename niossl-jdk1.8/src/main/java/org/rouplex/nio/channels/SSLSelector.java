@@ -13,6 +13,12 @@ import java.nio.channels.spi.AbstractSelector;
  * {@link SSLServerSocketChannel}s the same way as a Selector is used to register and select on {@link SocketChannel}s
  * or {@link ServerSocketChannel}s.
  *
+ * Further, an SSLSelector instance can be used to register and select on {@link SocketChannel}s or
+ * {@link ServerSocketChannel}s. The same SSLSelector instance can be used to register and select a mixture of the
+ * plain and SSL channels if needed.
+ *
+ * @see Selector
+ *
  * @author Andi Mullaraj (andimullaraj at gmail.com)
  */
 public abstract class SSLSelector extends AbstractSelector {
