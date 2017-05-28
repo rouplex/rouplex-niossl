@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>rouplex-niossl</artifactId>
-    <version>1.6.0</version>
+    <version>1.6.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Java SSL Socket Channels for Jdk1.6</name>
@@ -20,27 +20,6 @@
     </description>
 
     <properties>
-        <jdk.version>1.6</jdk.version>
-        <java.executable>${JAVA_1_6_HOME}/bin/java</java.executable>
-        <javac.executable>${JAVA_1_6_HOME}/bin/javac</javac.executable>
-        <aspectj.bootclasspath>${JAVA_1_6_HOME}/jre/lib/rt.jar:${JAVA_1_6_HOME}/jre/lib/jsse.jar</aspectj.bootclasspath>
+        <maven.compiler.target>1.6</maven.compiler.target>
     </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
-                <configuration>
-
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
-                    <fork>true</fork>
-                    <executable>${javac.executable}</executable>
-                    <compilerVersion>${jdk.version}</compilerVersion>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
