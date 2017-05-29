@@ -6,7 +6,7 @@
 
     <groupId>org.rouplex</groupId>
     <artifactId>rouplex-niossl-parent</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Java SSL Socket Channels</name>
@@ -53,30 +53,21 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
+                <artifactId>maven-toolchains-plugin</artifactId>
+                <version>1.1</version>
                 <executions>
                     <execution>
-                        <id>analyze</id>
                         <goals>
-                            <goal>analyze-only</goal>
+                            <goal>toolchain</goal>
                         </goals>
-                        <configuration>
-                            <failOnWarning>false</failOnWarning>
-                        </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
-                <extensions>true</extensions>
                 <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    <toolchains>
+                        <jdk>
+                            <version>[${maven.compiler.target},)</version>
+                        </jdk>
+                    </toolchains>
                 </configuration>
             </plugin>
         </plugins>
@@ -85,7 +76,6 @@
     <profiles>
         <profile>
             <id>release</id>
-
             <build>
                 <plugins>
                     <plugin>
@@ -129,6 +119,18 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.7</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

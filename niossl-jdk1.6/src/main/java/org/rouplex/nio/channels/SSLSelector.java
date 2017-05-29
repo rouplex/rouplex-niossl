@@ -28,7 +28,17 @@ public abstract class SSLSelector extends AbstractSelector {
     }
 
     /**
-     * {@inheritDoc}
+     * Opens an sslSelector.
+     *
+     * The new selector is created by invoking the {@link
+     * org.rouplex.nio.channels.spi.SSLSelectorProvider#openSelector openSelector} method of the system-wide default
+     * {@link org.rouplex.nio.channels.spi.SSLSelectorProvider} object.
+     *
+     * @return
+     *          A new sslSelector
+     *
+     * @throws  IOException
+     *          If an I/O error occurs
      */
     public static SSLSelector open() throws IOException {
         return SSLSelectorProvider.provider().openSelector();

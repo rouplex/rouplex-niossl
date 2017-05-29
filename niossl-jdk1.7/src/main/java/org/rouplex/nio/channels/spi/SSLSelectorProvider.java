@@ -239,8 +239,6 @@ public class SSLSelectorProvider extends SelectorProvider {
                 "Include rouplex-niossl-spi provider for a concrete implementation");
     }
 
-//////////////////////// JDK 7+ ///////////
-
     /**
      * This method is not implemented/available and it is not expected to be implemented by any provider.
      *

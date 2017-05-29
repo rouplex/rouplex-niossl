@@ -5,7 +5,9 @@ import org.rouplex.nio.channels.spi.SSLSelectorProvider;
 import javax.net.ssl.*;
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.net.SocketOption;
 import java.nio.channels.SocketChannel;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -22,6 +24,15 @@ public abstract class SSLSocketChannel extends SocketChannel {
     protected SSLSocketChannel(SSLSelectorProvider provider) {
         super(provider);
     }
+
+    /**
+     * Used to get access to the inner channel in order to implement the setting of socket options directly here. This
+     * way, the SPI is jdk agnostic (or more precisely it only needs to support the lowest jdk provided -- Jdk1.6).
+     *
+     * @return
+     *          The inner channel to be used for tcp communication with the remote endpoint
+     */
+    protected abstract SocketChannel innerChannel();
 
     /**
      * Create an {@link SSLServerSocketChannel} using the default security settings obtainable via
@@ -124,5 +135,25 @@ public abstract class SSLSocketChannel extends SocketChannel {
         }
 
         return sslSocketChannel;
+    }
+
+    @Override
+    public <T> SocketChannel setOption(SocketOption<T> name, T value) throws IOException {
+        return innerChannel().setOption(name, value);
+    }
+
+    @Override
+    public <T> T getOption(SocketOption<T> name) throws IOException {
+        return innerChannel().getOption(name);
+    }
+
+    @Override
+    public Set<SocketOption<?>> supportedOptions() {
+        return innerChannel().supportedOptions();
+    }
+
+    @Override
+    public SocketAddress getLocalAddress() throws IOException {
+        return socket().getLocalSocketAddress();
     }
 }
