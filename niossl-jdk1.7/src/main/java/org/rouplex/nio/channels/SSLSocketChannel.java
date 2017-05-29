@@ -28,7 +28,9 @@ public abstract class SSLSocketChannel extends SocketChannel {
     /**
      * Used to get access to the inner channel in order to implement the setting of socket options directly here. This
      * way, the SPI is jdk agnostic (or more precisely it only needs to support the lowest jdk provided -- Jdk1.6).
+     *
      * @return
+     *          The inner channel to be used for tcp communication with the remote endpoint
      */
     protected abstract SocketChannel innerChannel();
 
