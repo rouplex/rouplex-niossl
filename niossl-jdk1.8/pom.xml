@@ -7,11 +7,11 @@
     <parent>
         <groupId>org.rouplex</groupId>
         <artifactId>rouplex-niossl-parent</artifactId>
-        <version>1.1</version>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>rouplex-niossl</artifactId>
-    <version>1.8.1</version>
+    <version>${jdk}.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Java SSL Socket Channels for Jdk1.8</name>
@@ -20,8 +20,9 @@
     </description>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <jdk>1.8</jdk>
+        <maven.compiler.source>${jdk}</maven.compiler.source>
+        <maven.compiler.target>${jdk}</maven.compiler.target>
     </properties>
 
     <build>
