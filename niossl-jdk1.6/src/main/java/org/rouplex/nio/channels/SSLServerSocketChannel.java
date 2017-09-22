@@ -51,6 +51,6 @@ public abstract class SSLServerSocketChannel extends ServerSocketChannel {
      *         If anything goes wrong during the creation
      */
     public static SSLServerSocketChannel open(SSLContext sslContext) throws IOException {
-        return SSLSelectorProvider.provider().openServerSocketChannel(sslContext, null, null);
+        return SSLSelectorProvider.provider().openServerSocketChannel(sslContext, null);
     }
 }

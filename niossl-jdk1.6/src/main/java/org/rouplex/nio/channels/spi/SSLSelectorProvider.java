@@ -6,6 +6,7 @@ import org.rouplex.nio.channels.SSLSocketChannel;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.nio.channels.DatagramChannel;
@@ -152,7 +153,7 @@ public class SSLSelectorProvider extends SelectorProvider {
      */
     @Override
     public SSLServerSocketChannel openServerSocketChannel() throws IOException {
-        return openServerSocketChannel(null, null, null);
+        return openServerSocketChannel(null, null);
     }
 
     /**
@@ -166,10 +167,7 @@ public class SSLSelectorProvider extends SelectorProvider {
      *         authentication/authorization of the remote party.
      *         If null, then the default {@link SSLContext}, containing JRE's defaults, and obtainable internally via
      *         {@link SSLContext#getDefault()} will be used.
-     * @param acceptExecutorService
-     *         Used to manage the process of accepting a connection and performing the SSL handshake. If left null,
-     *         which is recommended, the default executorService internal to {@link SSLSelectorProvider} will be used.
-     * @param tasksExecutorService
+     * @param executorService
      *         Used to execute long blocking operations of sslEngine as well as occasional flush outs. If left null,
      *         which is recommended, the default executorService internal to {@link SSLSelectorProvider} will be used.
      *         This executor service should allow for parallel execution among its tasks, since sslEngine can take
@@ -180,8 +178,8 @@ public class SSLSelectorProvider extends SelectorProvider {
      *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
      *         SSLServerSocketChannel.
      */
-    public SSLServerSocketChannel openServerSocketChannel(SSLContext sslContext,
-            ExecutorService acceptExecutorService, ExecutorService tasksExecutorService) throws IOException {
+    public SSLServerSocketChannel openServerSocketChannel(
+        SSLContext sslContext, ExecutorService executorService) throws IOException {
 
         throw new IOException("This provider does not implement openServerSocketChannel. " +
                 "Include rouplex-niossl-spi provider for a concrete implementation");
@@ -198,7 +196,7 @@ public class SSLSelectorProvider extends SelectorProvider {
      */
     @Override
     public SSLSocketChannel openSocketChannel() throws IOException {
-        return openSocketChannel(null, false, null, null);
+        return openSocketChannel(null, null, 0, false, null, null);
     }
 
     /**
@@ -212,6 +210,14 @@ public class SSLSelectorProvider extends SelectorProvider {
      *         authentication/authorization of the remote party.
      *         If null, then the default {@link SSLContext}, containing JRE's defaults, and obtainable internally via
      *         {@link SSLContext#getDefault()} will be used.
+     * @param peerHost
+     *         The name of the remote host this channel will be connecting to, if the cipher suite requires it,
+     *         otherwise it will be ignored (and can be null). This parameter is used when creating the internal
+     *         {@link SSLEngine} handling the encryption/decryption and not  authenticated by the SSLEngine
+     *         (per documentation at https://docs.oracle.com/javase/7/docs/api/javax/net/ssl/SSLEngine.html#SSLEngine).
+     * @param peerPort
+     *         The remote port this channel will be connecting to if the cipher suite requires it, otherwise it will be
+     *         ignored (and can be 0).
      * @param clientMode
      *         True if the channel will be used on the client side, false if on the server
      * @param executorService
@@ -231,8 +237,8 @@ public class SSLSelectorProvider extends SelectorProvider {
      *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
      *         SSLSocketChannel.
      */
-    public SSLSocketChannel openSocketChannel(SSLContext sslContext, boolean clientMode,
-            ExecutorService executorService, SocketChannel innerChannel) throws IOException {
+    public SSLSocketChannel openSocketChannel(SSLContext sslContext, String peerHost, int peerPort,
+            boolean clientMode, ExecutorService executorService, SocketChannel innerChannel) throws IOException {
 
         throw new IOException("This provider does not implement openSocketChannel. " +
                 "Include rouplex-niossl-spi provider for a concrete implementation");

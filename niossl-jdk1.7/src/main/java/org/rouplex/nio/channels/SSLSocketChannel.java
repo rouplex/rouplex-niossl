@@ -43,7 +43,7 @@ public abstract class SSLSocketChannel extends SocketChannel {
      *         If anything goes wrong during the creation
      */
     public static SSLSocketChannel open() throws IOException {
-        return open(null, null, true, null, null);
+        return open(null, null, null, 0, true, null, null);
     }
 
     /**
@@ -57,7 +57,7 @@ public abstract class SSLSocketChannel extends SocketChannel {
      *         If anything goes wrong during the creation
      */
     public static SSLSocketChannel open(SocketAddress socketAddress) throws IOException {
-        return open(socketAddress, null, true, null, null);
+        return open(socketAddress, null, null, 0, true, null, null);
     }
 
     /**
@@ -74,7 +74,7 @@ public abstract class SSLSocketChannel extends SocketChannel {
      *         If anything goes wrong during the creation
      */
     public static SSLSocketChannel open(SSLContext sslContext) throws IOException {
-        return open(null, sslContext, true, null, null);
+        return open(null, sslContext, null, 0, true, null, null);
     }
 
     /**
@@ -94,7 +94,7 @@ public abstract class SSLSocketChannel extends SocketChannel {
      *         If anything goes wrong during the creation
      */
     public static SSLSocketChannel open(SocketAddress socketAddress, SSLContext sslContext) throws IOException {
-        return open(socketAddress, sslContext, true, null, null);
+        return open(socketAddress, sslContext, null, 0, true, null, null);
     }
 
     /**
@@ -111,7 +111,7 @@ public abstract class SSLSocketChannel extends SocketChannel {
      *         and obtainable via {@link SSLContext#getDefault()} will be used.
      * @param clientMode
      *         True if the channel will be used on the client side, false if on the server
-     * @param tasksExecutorService
+     * @param executorService
      *         The executor service to be used for the long standing {@link SSLEngine} tasks. If null, a default
      *         executor service, shared with other SSLSocketChannel instances, will be used.
      * @param innerChannel
@@ -125,10 +125,51 @@ public abstract class SSLSocketChannel extends SocketChannel {
      *         If anything goes wrong during the creation
      */
     public static SSLSocketChannel open(SocketAddress socketAddress, SSLContext sslContext,
-            boolean clientMode, ExecutorService tasksExecutorService, SocketChannel innerChannel) throws IOException {
+                                        boolean clientMode, ExecutorService executorService, SocketChannel innerChannel) throws IOException {
+
+        return open(socketAddress, sslContext, null, 0, clientMode, executorService, innerChannel);
+    }
+
+    /**
+     * Create an {@link SSLSocketChannel} using security settings defined in {@link SSLContext}, an existing (and
+     * possibly connected) {@link SocketChannel} and connect it before returning.
+     *
+     * @param socketAddress
+     *         The socketAddress to connect right after the channels creation
+     * @param sslContext
+     *         An instance of {@link SSLContext} via which the caller defines the {@link KeyManager} and {@link
+     *         TrustManager} providing the private keys and certificates for the encryption and
+     *         authentication/authorization of the remote party.
+     *         If this parameter is null, then the JRE's default sslContext instance, configured with JRE's defaults,
+     *         and obtainable via {@link SSLContext#getDefault()} will be used.
+     * @param peerHost
+     *         The name of the remote host this channel will be connecting to, if the cipher suite requires it,
+     *         otherwise it will be ignored (and can be null). This parameter is used when creating the internal
+     *         {@link SSLEngine} handling the encryption/decryption and not  authenticated by the SSLEngine
+     *         (per documentation at https://docs.oracle.com/javase/7/docs/api/javax/net/ssl/SSLEngine.html#SSLEngine).
+     * @param peerPort
+     *         The remote port this channel will be connecting to if the cipher suite requires it, otherwise it will be
+     *         ignored (and can be 0).
+     * @param clientMode
+     *         True if the channel will be used on the client side, false if on the server
+     * @param executorService
+     *         The executor service to be used for the long standing {@link SSLEngine} tasks. If null, a default
+     *         executor service, shared with other SSLSocketChannel instances, will be used.
+     * @param innerChannel
+     *         The inner channel to be used by the secure channels being created, if it exists. The inner channel would
+     *         exist in cases where the TCP connection has already been established (and possibly used) with the remote
+     *         party.
+     *         If null, a new channel will be created. If not null and not connected, the inner channel will first be
+     *         connected and then used by the secure channel for the remainder of the session.
+     * @return The newly created {@link SSLSocketChannel}
+     * @throws IOException
+     *         If anything goes wrong during the creation
+     */
+    public static SSLSocketChannel open(SocketAddress socketAddress, SSLContext sslContext, String peerHost, int peerPort,
+                                        boolean clientMode, ExecutorService executorService, SocketChannel innerChannel) throws IOException {
 
         SSLSocketChannel sslSocketChannel = SSLSelectorProvider.provider()
-                .openSocketChannel(sslContext, clientMode, tasksExecutorService, innerChannel);
+            .openSocketChannel(sslContext, peerHost, peerPort, clientMode, executorService, innerChannel);
 
         if (socketAddress != null) {
             sslSocketChannel.connect(socketAddress);

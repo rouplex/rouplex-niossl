@@ -1,18 +1,30 @@
 # README #
-Rouplex-Niossl is a java library providing SSL counterparts for classic java.nio.channels classes such as SocketChannel,
-ServerSocketChannel, Selector and SelectorProvider. This library is implemented in pure java, it is available for
-Jdk1.6 and later, and has no external dependencies. The SSL classes are completely compatible with the base classes
-(they simply extend and override their base functionality) and adhere fully to the channels documentation available at
-https://docs.oracle.com/javase/8/docs/api/java/nio/channels/package-summary.html. This way, the existing products can
-be easily updated to provide secure communication and new products can achieve security of data in transit by using the
-already proven patterns for communication.
+Rouplex-Niossl is a java SPI (service provider interface) for secure, selectable, non-blocking channels. Some of the
+classes in the java.nio.channels package have been extended by secure counterparts that can be used side by side,
+or replace existing instances of the plain implementations. This package contains just the entry point calls for 
+instantiating such instances, as well as a non-functional, default implementation. For a concrete implementation of
+these classes you can take a look at Rouplex-Niossl-Spi, which would be included as a separate dependency to your 
+applications.
+
+More specifically this library defines SSLSocketChannel class to inherit from SocketChannel, SSLServerSocketChannel
+to inherit from ServerSocketChannel and SSLSelector to inherit from SSLSelector. One or more instances of 
+SSLSocketChannel can be registered with an (or more) instance of SSLSelector to be selected upon, with the same
+exact semantics a SocketChannel would expect from registering with a Selector. Further, a mixture of SocketChannels
+and SSLSocketChannels can be registered simultaneously with an SSLSelector. The secure counterparts abide to the
+same API and semantics defined for plain channels at https://docs.oracle.com/javase/8/docs/api/java/nio/channels/package-summary.html.
+This way, the existing products can be easily updated to provide secure communication and new products can achieve 
+security of data in transit by using the already proven and excellent patterns for communication such as nio.
+
+This library is implemented in pure java, it is available for jdk 1.6 and later, and has no external dependencies. 
+The version of the artifact will imply the version of the JDK to be used with. At this time, the latest version 
+available for jdk:1.6 is rouplex-niossl:1.6.3, the latest for jdk:1.7 is rouplex-niossl:1.7.3 and so on.
 
 ## Description ##
 Most of the modern services and online applications use java.nio.channels as the better and faster alternative for
 communication, especially on the server side. Using this library would cut down considerably in complexity and
-development time since we have done the due diligence to make it completely compatible with the existing one for the
-plain channels. As an example, an existing application which is using ServerSocketChannel with a Selector for their
-communications, would need to simply replace two import statements
+development time since we have done the heavy lifting and due diligence to make it completely compatible with the 
+existing one for the plain channels. As an example, an existing application which is using ServerSocketChannel with 
+a Selector for their communications, would need to simply replace two import statements
 
         import java.nio.channels.Selector;
         import java.nio.channels.ServerSocketChannel;
