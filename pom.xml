@@ -141,5 +141,6 @@
         <module>niossl-jdk1.6</module>
         <module>niossl-jdk1.7</module>
         <module>niossl-jdk1.8</module>
+        <module>niossl-jdk1.9</module>
     </modules>
 </project>
