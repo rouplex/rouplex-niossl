@@ -173,7 +173,7 @@ public class SSLSelectorProvider extends SelectorProvider {
      *         which is recommended, the default executorService internal to {@link SSLSelectorProvider} will be used.
      *         This executor service should allow for parallel execution among its tasks, since sslEngine can take
      *         advantage of it when performing long ops (a singleThreadExecutor, for example, would be a bad choice).
-     *         Since the tasksExecutorService is not owned, it will not be shutdown when the channel is closed.
+     *         Since the executorService is not owned, it will not be shutdown when the channel is closed.
      * @return The newly created instance of {@link SSLServerSocketChannel}
      * @throws IOException
      *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
@@ -226,7 +226,7 @@ public class SSLSelectorProvider extends SelectorProvider {
      *         which is recommended, the default executorService internal to {@link SSLSelectorProvider} will be used.
      *         This executor service should allow for parallel execution among its tasks, since sslEngine can take
      *         advantage of it when performing long ops (a singleThreadExecutor, for example, would be a bad choice).
-     *         Since the tasksExecutorService is not owned, it will not be shutdown when the channel is closed.
+     *         Since the executorService is not owned, it will not be shutdown when the channel is closed.
      * @param innerChannel
      *         The inner channels to be used by the secure channels being created, if it exists. The innerServerChannel
      *         would exist in cases where the TCP connection has already been created (and possibly used) with the
