@@ -22,9 +22,9 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ExecutorService;
 
 /**
- * The base SSLSelectorProvider, containing code for loading an eventual implementation of the same.
- * If no implementations are found, then an instance of this class is returned, calls to which will fail with "not
- * implemented" {@link IOException}s.
+ * The base SSLSelectorProvider, containing the static calls for loading an eventual implementation of the same. If no
+ * implementations are found, either by class instantiation from system properties, or service provider libraries, then
+ * an instance of this same class is returned, calls to which will fail with "not implemented" {@link IOException}s.
  *
  * @author Andi Mullaraj (andimullaraj at gmail.com)
  */
@@ -38,9 +38,9 @@ public class SSLSelectorProvider extends SelectorProvider {
      * qualified class name representing an implementation of {@link SSLSelectorProvider}. If the class pointed to, is
      * loaded successfully then an instance of it will be created, cached for future use, and returned.
      *
-     * If for any reason, an implementation is still not found, then the {@link ServiceLoader} class will be used to
-     * look up for a service instance implementing a {@link SSLSelectorProvider}. If one is found, it will be cached
-     * for future use, and returned.
+     * If an implementation is still not found, then the {@link ServiceLoader} class will be used to look up for a
+     * service instance implementing a {@link SSLSelectorProvider}. If one is found, it will be cached for future use,
+     * then returned.
      *
      * Lastly, if an implementation is still not found, then an instance of this same class will be cached for future
      * use and returned. Calls to this implementation will fail with "not implemented" {@link IOException}s though.
@@ -172,7 +172,7 @@ public class SSLSelectorProvider extends SelectorProvider {
      *         which is recommended, the default executorService internal to {@link SSLSelectorProvider} will be used.
      *         This executor service should allow for parallel execution among its tasks, since sslEngine can take
      *         advantage of it when performing long ops (a singleThreadExecutor, for example, would be a bad choice).
-     *         Since the tasksExecutorService is not owned, it will not be shutdown when the channel is closed.
+     *         Since the executorService is not owned, it will not be shutdown when the channel is closed.
      * @return The newly created instance of {@link SSLServerSocketChannel}
      * @throws IOException
      *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
