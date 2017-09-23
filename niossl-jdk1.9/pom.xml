@@ -7,11 +7,11 @@
     <parent>
         <groupId>org.rouplex</groupId>
         <artifactId>rouplex-niossl-parent</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0.3</version>
     </parent>
 
     <artifactId>rouplex-niossl</artifactId>
-    <version>1.9.3-SNAPSHOT</version>
+    <version>1.9.3</version>
     <packaging>jar</packaging>
 
     <name>Java SSL Socket Channels for Jdk1.9</name>
