@@ -187,7 +187,7 @@ public class SSLSelectorProvider extends SelectorProvider {
 
     /**
      * Create an {@link SSLSocketChannel} instance using {@link SSLContext#getDefault()} and the default
-     *          {@link ExecutorService} of the {@link SSLSelectorProvider}
+     * {@link ExecutorService} of the {@link SSLSelectorProvider}
      *
      * @return The newly created instance of {@link SSLSocketChannel}
      * @throws IOException

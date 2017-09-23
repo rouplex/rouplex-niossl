@@ -1,19 +1,20 @@
 # README #
-Rouplex-Niossl is a java SPI (service provider interface) for secure, selectable, non-blocking channels. Some of the
-classes in the java.nio.channels package have been extended by secure counterparts that can be used side by side,
-or replace existing instances of the plain implementations. This package contains just the entry point calls for 
-instantiating such instances, as well as a non-functional, default implementation. For a concrete implementation of
-these classes you can take a look at Rouplex-Niossl-Spi, which would be included as a separate dependency to your 
-applications.
+Rouplex-Niossl is a java SPI (service provider interface) for secure (SSL/TLS), selectable, socket channels.
+Some of the classes in the java.nio.channels package have been extended by secure counterparts that can be used
+side by side, or replace existing instances of the plain implementations. This package contains just the entry
+point calls for instantiating such instances, as well as a non-functional, default implementation. For a
+concrete implementation of these classes you can take a look at Rouplex-Niossl-Spi, which would be included as
+a separate dependency to your applications.
 
-More specifically this library defines SSLSocketChannel class to inherit from SocketChannel, SSLServerSocketChannel
-to inherit from ServerSocketChannel and SSLSelector to inherit from SSLSelector. One or more instances of 
-SSLSocketChannel can be registered with an (or more) instance of SSLSelector to be selected upon, with the same
-exact semantics a SocketChannel would expect from registering with a Selector. Further, a mixture of SocketChannels
-and SSLSocketChannels can be registered simultaneously with an SSLSelector. The secure counterparts abide to the
-same API and semantics defined for plain channels at https://docs.oracle.com/javase/8/docs/api/java/nio/channels/package-summary.html.
-This way, the existing products can be easily updated to provide secure communication and new products can achieve 
-security of data in transit by using the already proven and excellent patterns for communication such as nio.
+More specifically this library defines SSLSocketChannel class to inherit from SocketChannel,
+SSLServerSocketChannel to inherit from ServerSocketChannel and SSLSelector to inherit from SSLSelector. One or
+more instances of SSLSocketChannel can be registered with an (or more) instance of SSLSelector to be selected
+upon, with the same exact semantics a SocketChannel would expect from registering with a Selector. Further, a
+mixture of SocketChannels and SSLSocketChannels can be registered simultaneously with an SSLSelector. The
+secure counterparts abide to the same API and semantics defined for plain channels at
+https://docs.oracle.com/javase/8/docs/api/java/nio/channels/package-summary.html. This way, the existing
+products can be easily updated to provide secure communication and new products can achieve security of data in
+transit by using the already proven and excellent patterns for communication such as nio.
 
 This library is implemented in pure java, it is available for jdk 1.6 and later, and has no external dependencies. 
 The version of the artifact will imply the version of the JDK to be used with. At this time, the latest version 
