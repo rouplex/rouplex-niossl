@@ -36,6 +36,10 @@ This library is implemented in pure java, it is available for jdk 1.6 and later,
 The version of the artifact will imply the version of the JDK to be used with. At this time, the latest version 
 available for jdk:1.6 is rouplex-niossl:1.6.4, the latest for jdk:1.7 is rouplex-niossl:1.7.4 and so on.
 
+(*) The only difference in behaviour between the SSLSocketChannel and SocketChannel is when shutdownOutput is called.
+In the case of a SocketChannel, the input can still be readable, whereas in the case of the SSLSocketChannel, the input
+might be closed from remote peer in response to our own shutdown (in ssl layer). This is a constrain coming from SSL
+specification itself, and no implementation can get around it (hence documented in this jar, representing the interface)
 ## Description ##
 Most of the distributed services use SocketChannels and Selectors as the faster and scalable alternative to the classic
 socket communication, especially on the server side. If such a service would need to be upgraded to use SSL
@@ -96,6 +100,9 @@ The version follows the jdk version for which this library is built. So, 1.6.[x]
 number x representing the update number for rouplex-niossl.
 
 ## Build ##
+You would only need to build this project if you want to change it for your own needs or planning to contribute. Otherwise
+the related artifact (jar file) is available in maven central repository.
+
 1. Maven is required to build the project. Please download and install it. Make sure the installation is successful by
 typing `mvn -version` in a shell window; the command output should be showing the installation folder.
 
