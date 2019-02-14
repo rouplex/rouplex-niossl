@@ -4,12 +4,10 @@ import org.rouplex.nio.channels.SSLSelector;
 import org.rouplex.nio.channels.SSLServerSocketChannel;
 import org.rouplex.nio.channels.SSLSocketChannel;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.TrustManager;
+import javax.net.ssl.*;
 import java.io.IOException;
 import java.net.ProtocolFamily;
+import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.Pipe;
 import java.nio.channels.ServerSocketChannel;
@@ -23,9 +21,17 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ExecutorService;
 
 /**
- * The base SSLSelectorProvider, containing the static calls for loading an eventual implementation of the same. If no
- * implementations are found, either by class instantiation from system properties, or service provider libraries, then
- * an instance of this same class is returned, calls to which will fail with "not implemented" {@link IOException}s.
+ * An extension of {@link SelectorProvider}, this class defines the methods for creating instances of
+ * {@link SSLSelector}, {@link SSLSocketChannel} and {@link SSLServerSocketChannel}.
+ *
+ * Non static methods on this class are stubs which fail with {@link IOException} if called. An implementation provider
+ * overrides them with their own implementation.
+ *
+ * This class also provides the static calls for dynamically locating and loading an instance this class. If no
+ * implementations are found, either via system properties, or service provider libraries, then an instance of this
+ * same class is returned, calls to which will fail with "not implemented" {@link IOException}s.
+ *
+ * @see SelectorProvider
  *
  * @author Andi Mullaraj (andimullaraj at gmail.com)
  */
@@ -130,12 +136,11 @@ public class SSLSelectorProvider extends SelectorProvider {
 
     /**
      * Create an {@link SSLSelector} which can be used to select on {@link SSLSocketChannel},
-     * {@link SSLServerSocketChannel}, {@link SocketChannel}, {@link ServerSocketChannel}
+     * {@link SSLServerSocketChannel}, {@link SocketChannel}, {@link ServerSocketChannel} instances
      *
      * @return The created SSLSelector
      * @throws IOException
-     *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
-     *         SSLSelector.
+     *         If the provider is the default no-op provider, or any other problem trying to create the SSLSelector.
      */
     @Override
     public SSLSelector openSelector() throws IOException {
@@ -144,13 +149,12 @@ public class SSLSelectorProvider extends SelectorProvider {
     }
 
     /**
-     * Create an {@link SSLServerSocketChannel} instance using {@link SSLContext#getDefault()} and the default
-     * {@link ExecutorService} of the {@link SSLSelectorProvider}
+     * Create an {@link SSLServerSocketChannel} using the default security settings obtainable via
+     * {@link SSLContext#getDefault()}.
      *
-     * @return The newly created instance of {@link SSLServerSocketChannel}
+     * @return The newly created SSLServerSocketChannel
      * @throws IOException
-     *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
-     *         SSLServerSocketChannel.
+     *         The reason the SSLServerSocketChannel could not be created
      */
     @Override
     public SSLServerSocketChannel openServerSocketChannel() throws IOException {
@@ -158,42 +162,40 @@ public class SSLSelectorProvider extends SelectorProvider {
     }
 
     /**
-     * Create an {@link SSLServerSocketChannel} instance by using an optional {@link SSLContext} for custom security
-     * needs, an optional {@link ExecutorService} for managing new connections, and an optional {@link ExecutorService}
-     * to be used by the {@link SSLSocketChannel}s accepted/created.
+     * Create an {@link SSLServerSocketChannel} using security settings defined in {@link SSLContext} and an optional
+     * executorService for background tasks.
      *
      * @param sslContext
      *         An instance of {@link SSLContext} via which the caller defines the {@link KeyManager} and {@link
-     *         TrustManager} providing the private keys and certificates for the encryption and
-     *         authentication/authorization of the remote party.
-     *         If null, then the default {@link SSLContext}, containing JRE's defaults, and obtainable internally via
+     *         TrustManager} providing the private keys and certificates for the encryption and authentication of the
+     *         remote party. If this parameter is null, then the JRE's default sslContext instance obtainable via
      *         {@link SSLContext#getDefault()} will be used.
      * @param executorService
-     *         Used to execute long blocking operations of sslEngine as well as occasional flush outs. If left null,
-     *         which is recommended, the default executorService internal to {@link SSLSelectorProvider} will be used.
+     *         The executor service to be used for the long standing {@link SSLEngine} tasks. Except for more advanced
+     *         use cases, our recommendation is to pass null, in which case the {@link SSLSelectorProvider}'s default
+     *         executor service, shared with other SSLSocketChannel instances, will be used.
      *         This executor service should allow for parallel execution among its tasks, since sslEngine can take
      *         advantage of it when performing long ops (a singleThreadExecutor, for example, would be a bad choice).
-     *         Since the executorService is not owned, it will not be shutdown when the channel is closed.
-     * @return The newly created instance of {@link SSLServerSocketChannel}
+     *         The executorService is not considered to be owned by the returned SSLSocketChannel instance, so it will
+     *         not be shutdown when the channel is closed.
+     * @return The newly created SSLServerSocketChannel
      * @throws IOException
-     *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
-     *         SSLServerSocketChannel.
+     *         The reason the SSLServerSocketChannel could not be created
      */
     public SSLServerSocketChannel openServerSocketChannel(
-        SSLContext sslContext, ExecutorService executorService) throws IOException {
+            SSLContext sslContext, ExecutorService executorService) throws IOException {
 
         throw new IOException("This provider does not implement openServerSocketChannel. " +
                 "Include rouplex-niossl-spi provider for a concrete implementation");
     }
 
     /**
-     * Create an {@link SSLSocketChannel} instance using {@link SSLContext#getDefault()} and the default
-     *          {@link ExecutorService} of the {@link SSLSelectorProvider}
+     * Create an {@link SSLSocketChannel} using the default security settings obtainable via
+     * {@link SSLContext#getDefault()}.
      *
-     * @return The newly created instance of {@link SSLSocketChannel}
+     * @return The newly created SSLSocketChannel
      * @throws IOException
-     *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
-     *         SSLSocketChannel.
+     *         The reason the SSLSocketChannel could not be created
      */
     @Override
     public SSLSocketChannel openSocketChannel() throws IOException {
@@ -201,48 +203,54 @@ public class SSLSelectorProvider extends SelectorProvider {
     }
 
     /**
-     * Create an {@link SSLSocketChannel} instance by using an optional {@link SSLContext} for custom security
-     * needs, an optional {@link ExecutorService} for managing ssl handshakes, and an optional {@link SocketChannel}
-     * to be used as underlying communication medium for the secure communication.
+     * Create an {@link SSLSocketChannel} using security settings defined in {@link SSLContext}, an optional peerHost
+     * and peerPort for {@link SSLSession} caching strategies (or when Kerberos is used), a clientMode defining whether
+     * this channel must start handshaking in "client" mode, an optional executorService for background tasks and an
+     * optional {@link SocketChannel}. The returned instance is not connected (even if the inner channel is), so a call
+     * to {@link SSLSocketChannel#connect(SocketAddress)} is necessary afterwards.
      *
+     * The reason for peerHost/peerPort is twofold, for SSLSession cashing strategies, as well when using Kerberos
+     * cipher suites. For more visit
+     * https://docs.oracle.com/javase/7/docs/api/javax/net/ssl/SSLContext.html#createSSLEngine(java.lang.String, int)
+
      * @param sslContext
      *         An instance of {@link SSLContext} via which the caller defines the {@link KeyManager} and {@link
-     *         TrustManager} providing the private keys and certificates for the encryption and
-     *         authentication/authorization of the remote party.
-     *         If null, then the default {@link SSLContext}, containing JRE's defaults, and obtainable internally via
+     *         TrustManager} providing the private keys and certificates for the encryption and authentication of the
+     *         remote party. If this parameter is null, then the JRE's default sslContext instance obtainable via
      *         {@link SSLContext#getDefault()} will be used.
      * @param peerHost
-     *         The name of the remote host this channel will be connecting to, if the cipher suite requires it,
-     *         otherwise it will be ignored (and can be null). This parameter is used when creating the internal
-     *         {@link SSLEngine} handling the encryption/decryption and not  authenticated by the SSLEngine
-     *         (per documentation at https://docs.oracle.com/javase/7/docs/api/javax/net/ssl/SSLEngine.html#SSLEngine).
+     *         The name of the remote host this channel will be connecting to. It must be present if SSLSession reuse
+     *         is preferred or if Kerberos cipher suites are used. Otherwise it can be left to null.
      * @param peerPort
-     *         The remote port this channel will be connecting to if the cipher suite requires it, otherwise it will be
-     *         ignored (and can be 0).
+     *         The remote port this channel will be connecting to. It must be a positive number if SSLSession reuse
+     *         is preferred or if Kerberos cipher suites are used. Otherwise it can be left to 0.
      * @param clientMode
-     *         True if the channel will be used on the client side, false if on the server
+     *         True if the channel must start handshaking in "client" mode, false otherwise
      * @param executorService
-     *         Used to execute long blocking operations of sslEngine as well as occasional flush outs. If left null,
-     *         which is recommended, the default executorService internal to {@link SSLSelectorProvider} will be used.
+     *         The executor service to be used for the long standing {@link SSLEngine} tasks. Except for more advanced
+     *         use cases, our recommendation is to pass null, in which case the {@link SSLSelectorProvider}'s default
+     *         executor service, shared with other SSLSocketChannel instances, will be used.
      *         This executor service should allow for parallel execution among its tasks, since sslEngine can take
      *         advantage of it when performing long ops (a singleThreadExecutor, for example, would be a bad choice).
-     *         Since the executorService is not owned, it will not be shutdown when the channel is closed.
+     *         The executorService is not considered to be owned by the returned SSLSocketChannel instance, so it will
+     *         not be shutdown when the channel is closed.
      * @param innerChannel
-     *         The inner channels to be used by the secure channels being created, if it exists. The innerServerChannel
-     *         would exist in cases where the TCP connection has already been created (and possibly used) with the
-     *         remote party.
-     *         If null, a new channel will be created. If not null and not connected, the innerServerChannel will first
-     *         be connected and then used by the secure one for the remainder of the session.
-     * @return The newly created instance of {@link SSLSocketChannel}
+     *         The inner channel to be used by the secure channel being created, if it exists. Passing an inner channel
+     *         is useful in cases where the TCP connection has already been established (and possibly used) with the
+     *         remote peer, and now they have agreed to secure their line via SSL/TLS. If null is passed, a new channel
+     *         will be created; if a not null and not connected channel is passed, the inner channel will first be
+     *         connected and then used by the secure channel for the remainder of the session. The innerChannel should
+     *         not be used after this moment, and it will close when this channel closes (either via a call to
+     *         {@link SSLSocketChannel#close()} or a condition leading to its closure)
+     * @return The newly created SSLSocketChannel
      * @throws IOException
-     *         If the provider is the default no-op skeleton provider, or any other problem trying to instantiate the
-     *         SSLSocketChannel.
+     *         The reason the SSLSocketChannel could not be created
      */
     public SSLSocketChannel openSocketChannel(SSLContext sslContext, String peerHost, int peerPort,
-            boolean clientMode, ExecutorService executorService, SocketChannel innerChannel) throws IOException {
+                                              boolean clientMode, ExecutorService executorService, SocketChannel innerChannel) throws IOException {
 
         throw new IOException("This provider does not implement openSocketChannel. " +
-            "Include rouplex-niossl-spi provider for a concrete implementation");
+                "Include rouplex-niossl-spi provider for a concrete implementation");
     }
 
     /**

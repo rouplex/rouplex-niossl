@@ -13,9 +13,8 @@ import java.nio.channels.spi.AbstractSelector;
  * {@link SSLServerSocketChannel}s the same way as a Selector is used to register and select on {@link SocketChannel}s
  * or {@link ServerSocketChannel}s.
  *
- * Further, an SSLSelector instance can be used to register and select on {@link SocketChannel}s or
- * {@link ServerSocketChannel}s. The same SSLSelector instance can be used to register and select a mixture of the
- * plain and SSL channels if needed.
+ * Further, an SSLSelector can be used to register and select on a mixture of {@link SSLSocketChannel}s,
+ * {@link SocketChannel}s, {@link SSLServerSocketChannel}s or {@link ServerSocketChannel}s if needed to.
  *
  * @see Selector
  *
@@ -28,14 +27,10 @@ public abstract class SSLSelector extends AbstractSelector {
     }
 
     /**
-     * Opens an sslSelector.
-     *
-     * The new selector is created by invoking the {@link
-     * org.rouplex.nio.channels.spi.SSLSelectorProvider#openSelector openSelector} method of the system-wide default
-     * {@link org.rouplex.nio.channels.spi.SSLSelectorProvider} object.
+     * Opens an sslSelector using the default {@link SSLSelectorProvider}.
      *
      * @return
-     *          A new sslSelector
+     *          An sslSelector
      *
      * @throws  IOException
      *          If an I/O error occurs
