@@ -49,8 +49,8 @@ are done.
 
 Using this library you cut down considerably in complexity and development time since we have done the heavy lifting
 and the due diligence to make it completely compatible with the existing one for the plain channels. As an example, an
-existing application which is using ServerSocketChannel with a Selector for their communications, would be turned into
-a secure one, by simply replacing:
+existing application which is using SocketChannel with a Selector for their communications, would be turned into a 
+secure one, by simply replacing:
 
     Selector selector = Selector.open();
     SocketChannel socketChannel = SocketChannel.open();
@@ -59,7 +59,7 @@ a secure one, by simply replacing:
     while(true) {
         selector.select();
         for (SocketChannel sc : selector.selectedKeys() {
-            socketChannel.read(...)
+            sc.read(...)
         }
     }
 
@@ -72,7 +72,7 @@ with:
     while(true) {
         selector.select();
         for (SocketChannel sc : selector.selectedKeys() {
-            socketChannel.read(...)
+            sc.read(...)
         }
     }
 
@@ -88,7 +88,7 @@ Or, the same application would be able to handle plain and secure communications
     while(true) {
         selector.select();
         for (SocketChannel sc : selector.selectedKeys() {
-            socketChannel.read(...)
+            sc.read(...)
         }
     }
 
